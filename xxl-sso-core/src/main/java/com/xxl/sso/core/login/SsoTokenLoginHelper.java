@@ -42,6 +42,7 @@ public class SsoTokenLoginHelper {
 
         SsoLoginStore.remove(storeKey);
     }
+
     /**
      * client logout
      *
@@ -59,7 +60,7 @@ public class SsoTokenLoginHelper {
      * @param sessionId
      * @return
      */
-    public static XxlSsoUser loginCheck(String  sessionId){
+    public static XxlSsoUser loginCheck(String sessionId) {
 
         String storeKey = SsoSessionIdHelper.parseStoreKey(sessionId);
         if (storeKey == null) {
@@ -71,8 +72,13 @@ public class SsoTokenLoginHelper {
             String version = SsoSessionIdHelper.parseVersion(sessionId);
             if (xxlUser.getVersion().equals(version)) {
 
+                /**
+                 *   感觉这里为:if ((System.currentTimeMillis() - 1559206494968L) > ExpireMinite * 60 * 1000 / 2)
+                 *   因为 getExpireMinite() 应该是分钟,要转为毫秒
+                 *
+                 */
                 // After the expiration time has passed half, Auto refresh
-                if ((System.currentTimeMillis() - xxlUser.getExpireFreshTime()) > xxlUser.getExpireMinite()/2) {
+                if ((System.currentTimeMillis() - xxlUser.getExpireFreshTime()) > xxlUser.getExpireMinite() / 2) {
                     xxlUser.setExpireFreshTime(System.currentTimeMillis());
                     SsoLoginStore.put(storeKey, xxlUser);
                 }
@@ -90,7 +96,7 @@ public class SsoTokenLoginHelper {
      * @param request
      * @return
      */
-    public static XxlSsoUser loginCheck(HttpServletRequest request){
+    public static XxlSsoUser loginCheck(HttpServletRequest request) {
         String headerSessionId = request.getHeader(Conf.SSO_SESSIONID);
         return loginCheck(headerSessionId);
     }
